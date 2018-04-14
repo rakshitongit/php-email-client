@@ -12,23 +12,29 @@ use Ddeboer\Imap\Server;
 
 //Load Composer's autoloader
 require 'vendor/autoload.php';
-
 if (isset($_REQUEST["sendmail"]) && $_REQUEST["sendmail"] == "yes") {
     $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
     try {
         //Server settings
-        $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+        //$mail->SMTPDebug = 2;                                 // Enable verbose debug output
         $mail->isSMTP();                                      // Set mailer to use SMTP
         $mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
-        $mail->SMTPAuth = true;                               // Enable SMTP authentication
-        $mail->Username = 'user@example.com';                 // SMTP username
-        $mail->Password = 'secret';                           // SMTP password
+        $mail->SMTPAuth = true;// Enable SMTP authentication
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
+        $mail->Username = '';                 // SMTP username
+        $mail->Password = '';                           // SMTP password
         $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
         $mail->Port = 587;                                    // TCP port to connect to
 
         //Recipients
         $email = $_REQUEST["emailid"];
-        $mail->setFrom('from@example.com', 'Mailer');
+        $mail->setFrom('Your Email Id', 'Your Name');
         $mail->addAddress($email);     // Add a recipient
         /*$mail->addAddress('ellen@example.com');               // Name is optional
         $mail->addReplyTo('info@example.com', 'Information');
@@ -50,31 +56,25 @@ if (isset($_REQUEST["sendmail"]) && $_REQUEST["sendmail"] == "yes") {
     } catch (Exception $e) {
         echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
     }
+    exit;
 }
 
-if (isset($_REQUEST["receivemails"]) && $_REQUEST["receivemails"] == "yes") {
 
-    $server = new Server('imap.zoho.com');
+$server = new Server('Your mailer imap url');   // Eg for Gmail imap.gmail.com
 
 // $connection is instance of \Ddeboer\Imap\Connection
-    $connection = $server->authenticate('rakshit@3iology.com', ']b/4G83VfwN6"~+A');
-
-    $server = new Server(
-        'imap.zoho.com', // required
-        993,     // defaults to '993'
-        '/imap/ssl/validate-cert'    // defaults to '/imap/ssl/validate-cert'
-    );
+$connection = $server->authenticate('youremail@mail.com', 'your email-password');
 
 //$mailboxs = $connection->getMailboxes();
 //foreach ($mailboxs as $mailbox) {
 //    echo $mailbox->getName().'<br>';
 //}
 
-    $mailbox = $connection->getMailbox('INBOX');
+$mailbox = $connection->getMailbox('INBOX');
 
 //var_dump($mailbox);
 
-    $messages = $mailbox->getMessages();
+$messages = $mailbox->getMessages();
 //$today = new DateTimeImmutable();
 //$lastMonth = $today->sub(new DateInterval('P2D'));
 //
@@ -84,29 +84,12 @@ if (isset($_REQUEST["receivemails"]) && $_REQUEST["receivemails"] == "yes") {
 //    true // Descending order
 //);
 //var_dump($messages);
-
-    foreach ($messages as $message) {
-        // $message is instance of \Ddeboer\Imap\Message
-        $message->getBodyText();
-        var_dump($email_from = $message->getFrom()->getAddress());
-        $user_id = find_userid_from_email($conn,$email_from);
-        if ($user_id == null) {
-            echo "Not a registered User";
-            continue;
-        }
-        $eid = insert_email_content($conn, $message->getBodyText(), $message->getBodyHtml(), $user_id);    // userid to be inserted
-        $attachments = $message->getAttachments();
-        foreach ($attachments as $attachment) {
-            $aid = insert_email_attachments($conn, $attachment->getFilename(), $eid);
-//        echo $attachment->getFilename() . '<br>';
-            // $attachment is instance of \Ddeboer\Imap\Message\Attachment
-            file_put_contents(
-                './download-attachment/' . $eid . $attachment->getFilename(),
-                $attachment->getDecodedContent()
-            );
-        }
-        $mailbox = $connection->getMailbox('Finished-Parsing');
-        $message->move($mailbox);
-        $connection->expunge();
-    }
+$data = array();
+foreach ($messages as $message) {
+    // $message is instance of \Ddeboer\Imap\Message
+    $temp["body"] = $message->getBodyText();
+    $temp["email"] = $message->getFrom()->getAddress();
+    $temp["subject"] = $message->getSubject();
+    $data[] = $temp;
 }
+//print_r($data);

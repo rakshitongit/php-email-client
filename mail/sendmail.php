@@ -1,3 +1,6 @@
+<?php
+include '../mailer.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,8 +10,10 @@
     <link rel="stylesheet" href="./css/fontawesone.css">
     <link rel="stylesheet" href="./css/styles.css">
     <link rel="stylesheet" href="./css/asb.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="js/bootstrap.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script src="js/highlight.js"></script>
 </head>
 <body>
@@ -27,7 +32,7 @@
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                             </button>
-                            <a class="navbar-brand" id="brand" href="#">Hello, <u>Obama!</u></a>
+                            <a class="navbar-brand" id="brand" href="#">Hello, <u>Darshan!</u></a>
                         </div>
                     </div>
                 </nav>
@@ -108,7 +113,34 @@
                                     </div>
                                 </div>
                                 <hr>
-                                <div id="grid"></div>
+                                <div id="grid123">
+                                    <table id="example" class="display" style="width:100%">
+                                        <thead>
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Email</th>
+                                            <th>Subject</th>
+                                            <th>Open Mail</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php
+                                        $i = 0;
+                                        foreach ($data as $t) {
+                                            ?>
+                                            <tr>
+                                                <td><?=$i+1?></td>
+                                                <td><?= $t["email"] ?></td>
+                                                <td><?= $t["subject"] ?></td>
+                                                <td><button class="btn btn-success" onclick="openModal(<?=$i?>)">Open Mail</button></td>
+                                            </tr>
+                                            <?php
+                                            $i++;
+                                        }
+                                        ?>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -169,6 +201,24 @@
                 </div>
             </div>
             <!-- End of modal -->
+
+            <div class="modal fade" id="myModalBody" tabindex="-1" role="dialog" aria-labelledby="exampleModal"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5>Email-id: <span id="emailid"></span></h5>
+                        </div>
+                        <div class="modal-body">
+                            <h4>Subject: <span id="subject"></span></h4>
+                            <h5>Body: <span id="body"></span></h5>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Modal view -->
             <div class="modal fade" id="myModalsuccess" tabindex="-1" role="dialog" aria-labelledby="exampleModal"
@@ -300,8 +350,7 @@
 <!-- you need to include the shieldui css and js assets in order for the charts to work -->
 <link rel="stylesheet" type="text/css"
       href="http://www.shieldui.com/shared/components/latest/css/light-bootstrap/all.min.css"/>
-<script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
-<script type="text/javascript" src="http://www.prepbootstrap.com/Content/data/emailData.js"></script>
+
 
 <script type="text/javascript">
     $(function () {
@@ -366,9 +415,18 @@
         });
         return false;
     }
-    
-    function receivemail() {
-        
+
+    $(document).ready(function () {
+        $('#example').DataTable();
+    });
+
+    function openModal(id) {
+        var data = <?=json_encode($data)?>;
+        $('#myModalBody').modal('hide');
+        $('#myModalBody').modal('show');
+        $('#emailid').html(data[id]["email"]);
+        $('#subject').html(data[id]["subject"]);
+        $('#body').html(data[id]["body"]);
     }
 </script>
 
