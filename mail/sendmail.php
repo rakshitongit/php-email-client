@@ -32,7 +32,7 @@ include '../mailer.php';
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                             </button>
-                            <a class="navbar-brand" id="brand" href="#">Hello, <u>Darshan!</u></a>
+                            <a class="navbar-brand" id="brand" href="#">Hello, <u>Rakshit!</u></a>
                         </div>
                     </div>
                 </nav>

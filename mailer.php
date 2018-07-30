@@ -10,6 +10,9 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Ddeboer\Imap\Server;
 
+error_reporting(E_ALL);
+ini_set('display_errors', TRUE);
+ini_set('display_startup_errors', TRUE);
 //Load Composer's autoloader
 require 'vendor/autoload.php';
 if (isset($_REQUEST["sendmail"]) && $_REQUEST["sendmail"] == "yes") {
@@ -60,10 +63,10 @@ if (isset($_REQUEST["sendmail"]) && $_REQUEST["sendmail"] == "yes") {
 }
 
 
-$server = new Server('Your mailer imap url');   // Eg for Gmail imap.gmail.com
+$server = new Server('imap.gmail.com');   // Eg for Gmail imap.gmail.com
 
 // $connection is instance of \Ddeboer\Imap\Connection
-$connection = $server->authenticate('youremail@mail.com', 'your email-password');
+$connection = $server->authenticate('rrrssb1@gmail.com', 'pittaganna2015');
 
 //$mailboxs = $connection->getMailboxes();
 //foreach ($mailboxs as $mailbox) {
@@ -74,15 +77,24 @@ $mailbox = $connection->getMailbox('INBOX');
 
 //var_dump($mailbox);
 
-$messages = $mailbox->getMessages();
-//$today = new DateTimeImmutable();
-//$lastMonth = $today->sub(new DateInterval('P2D'));
-//
-//$messages = $mailbox->getMessages(
-//    new Ddeboer\Imap\Search\Date\Since($lastMonth),
-//    \SORTDATE, // Sort criteria
-//    true // Descending order
-//);
+//$messages = $mailbox->getMessages();
+use Ddeboer\Imap\SearchExpression;
+use Ddeboer\Imap\Search\Email\To;
+use Ddeboer\Imap\Search\Text\Body;
+
+$search = new SearchExpression();
+$search->addCondition(new To('sharadkamath@rocketmail.com'));
+//$search->addCondition(new Body('contents'));
+
+$messages = $mailbox->getMessages($search);
+/*$today = new DateTimeImmutable();
+$lastMonth = $today->sub(new DateInterval('P30D'));
+
+$messages = $mailbox->getMessages(
+    new Ddeboer\Imap\Search\Date\Since($lastMonth),
+    \SORTDATE, // Sort criteria
+    true // Descending order
+);*/
 //var_dump($messages);
 $data = array();
 foreach ($messages as $message) {
